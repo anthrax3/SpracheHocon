@@ -45,11 +45,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pair.cs" />
-    <Compile Include="Path.cs" />
+    <Compile Include="Ast\HoconArray.cs" />
+    <Compile Include="Ast\HoconInclude.cs" />
+    <Compile Include="Ast\HoconLiteral.cs" />
+    <Compile Include="Ast\HoconObject.cs" />
+    <Compile Include="Ast\HoconSubstitution.cs" />
+    <Compile Include="Ast\Pair.cs" />
+    <Compile Include="Ast\Path.cs" />
+    <Compile Include="Config\ConfigObject.cs" />
+    <Compile Include="Config\ConfigValue.cs" />
+    <Compile Include="Parser\HoconParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Value.cs" />
+    <Compile Include="Ast\HoconValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

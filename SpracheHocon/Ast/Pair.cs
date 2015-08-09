@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SpracheHocon
+﻿namespace SpracheHocon.Ast
 {
     public class Pair
     {
         public Path Path { get; private set; }
-        public Value Value { get; private set; }
+        public HoconValue Value { get; private set; }
 
-        public Pair(Path path, Value value)
+        public Pair(Path path, HoconValue value)
         {
             Path = path;
             Value = value;
