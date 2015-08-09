@@ -69,4 +69,19 @@ namespace SpracheHocon
             return "${" + Path + "}";
         }
     }
+
+    public class HoconInclude : Value
+    {
+        public string File { get; private set; }
+
+        public HoconInclude(string file)
+        {
+            this.File = file;
+        }
+
+        public override string ToString()
+        {
+            return "{ include \"" + File + "\" }";
+        }
+    }
 }

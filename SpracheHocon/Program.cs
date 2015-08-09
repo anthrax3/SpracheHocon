@@ -8,34 +8,37 @@ namespace SpracheHocon
     {
         private static void Main(string[] args)
         {
-            var newLines  = HoconParser.HoconArray.Parse(@"
-   [ 
-  1
-  2
-  3
- ]
-  
- 
- 
-  ");
+            var str = " \"hej\" ";
+            var t = HoconParser.QuotedString.Parse(str);
+//            var newLines  = HoconParser.HoconArray.Parse(@"
+//   [ 
+//  1
+//  2
+//  3
+// ]
+//  
+// 
+// 
+//  ");
 
-            
-//            var res = HoconParser.HoconObject.Parse(@"
-//{
-//    a {
-//       b {
-//         c = 123
-//       }
-//    } 
-//    c = [   1
-//            2
-//            3
-//            4 
-//        ],
-//    d= ${a.b.c.d.e}
-//}
-//");
-//            Console.WriteLine(res);
+
+            var res = HoconParser.HoconObject.Parse(@"
+{
+    x = { include ""bar"" },
+    a {
+       b {
+         c = 123
+       }
+    }, 
+    c = [   1,
+            2,
+            3,
+            4 
+        ],
+    d= ${a.b.c.d.e}
+}
+");
+            Console.WriteLine(res);
             Console.ReadKey();
         }
     }
@@ -82,14 +85,30 @@ namespace SpracheHocon
                 .Select(l => new HoconLiteral(l))
                 .Named("HoconLiteral");
 
+        public static readonly Parser<string> QuotedString =
+            Parse.LetterOrDigit.Many().Text()
+                .Contained(Parse.String("\""), Parse.String("\""))
+                .Token()
+                .Named("QuotedString");
+
         public static readonly Parser<Value> HoconSubstitution =
             Path
                 .Contained(Parse.String("${").Token(), Parse.String("}").Token())
                 .Select(p => new HoconSubstitution(p))
                 .Named("HoconSubstitution");
 
+
+        public static readonly Parser<Value> HoconInclude =
+            (from _ in Parse.String("include").Token()
+             from file in QuotedString
+             select file)
+                .Contained(Parse.String("{").Token(), Parse.String("}").Token())
+                .Select(file => new HoconInclude(file))
+                .Named("HoconSubstitution");
+
         public static readonly Parser<Value> Value =
-            HoconObject
+            HoconInclude
+                .Or(HoconObject)
                 .Or(HoconLiteral)
                 .Or(HoconArray)
                 .Or(HoconSubstitution)
