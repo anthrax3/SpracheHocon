@@ -48,15 +48,12 @@ namespace SpracheHocon
         public static readonly Parser<string> SpaceOrTab =
             Parse.Char(' ').Or(Parse.Char('\t')).Many().Text().Named("SpaceOrTab");
 
-        
-
         public static readonly Parser<string> NewLine = Parse.LineEnd;
 
         public static readonly Parser<string> NewLineToken = Parse.LineEnd.Contained(SpaceOrTab, SpaceOrTab);
 
         public static readonly Parser<string> NewLineSeparator = NewLineToken.AtLeastOnce().Select(x => string.Join("", x)); 
 
-        //Not token, but just single line?
         public static readonly Parser<string> CommaSeparator = Parse.String(",").Token().Text();
 
         public static readonly Parser<string> Separator = NewLineSeparator.Or(CommaSeparator).Named("Separator");
