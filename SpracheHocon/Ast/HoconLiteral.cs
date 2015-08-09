@@ -1,6 +1,6 @@
 namespace SpracheHocon.Ast
 {
-    public class HoconLiteral : HoconValue
+    public class HoconLiteral : HoconElement
     {
         public string Literal { get; private set; }
 

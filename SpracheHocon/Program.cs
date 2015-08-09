@@ -25,6 +25,7 @@ namespace SpracheHocon
             var res = HoconParser.HoconObject.Parse(@"
 {
     a.b.c.d { e = 7},
+    ""foo bar""=1,
     x { 
         include ""bar"" 
     },
@@ -33,7 +34,7 @@ namespace SpracheHocon
          c = 123
        }
     }, 
-    c = [   1,
+    c = [   1 2 3 ""bar"" ${a.b.c.d.e},
             2,
             3,
             4 

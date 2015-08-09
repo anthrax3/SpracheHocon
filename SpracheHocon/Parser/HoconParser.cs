@@ -6,6 +6,9 @@ namespace SpracheHocon.Parser
 {
     public static class HoconParser
     {
+        private static readonly Parser<char> NotInUnquotedKey = Parse.CharExcept("$\"{}[]:=,#`^?!@*&\\.");
+        private static readonly Parser<char> NotInUnquotedText = Parse.CharExcept("$\"{}[]:=,#`^?!@*&\\\r\n");
+
         public static readonly Parser<string> AssignOp =
             Parse.String(":").Or(Parse.String("=")).Token().Text().Named("AssignOp");
 
@@ -22,8 +25,13 @@ namespace SpracheHocon.Parser
 
         public static readonly Parser<string> Separator = NewLineSeparator.Or(CommaSeparator).Named("Separator");
 
+        public static readonly Parser<string> UnquotedKey = NotInUnquotedKey.AtLeastOnce().Token().Text();
+
+        public static readonly Parser<HoconElement> UnquotedString =
+            NotInUnquotedText.AtLeastOnce().Token().Text().Select(t => new HoconLiteral(t));
+
         public static readonly Parser<Path> Path =
-            Parse.Identifier(Parse.LetterOrDigit, Parse.LetterOrDigit)
+            UnquotedKey.Or(Parse.Ref(() => QuotedString))
                 .DelimitedBy(Parse.Char('.'))
                 .Token()
                 .Select(p => new Path(p))
@@ -41,10 +49,10 @@ namespace SpracheHocon.Parser
                 .Contained(Parse.Char('[').Token(), Parse.Char(']').Token()).Select(values => new HoconArray(values))
                 .Named("HoconArray");
 
-        public static readonly Parser<HoconValue> HoconLiteral =
-            Parse.Identifier(Parse.LetterOrDigit, Parse.LetterOrDigit).Token()
-                .Select(l => new HoconLiteral(l))
-                .Named("HoconLiteral");
+        public static readonly Parser<HoconValue> HoconLiterals =
+            UnquotedString.Or(Parse.Ref(() => Q)).Or(Parse.Ref(() => HoconSubstitution)).AtLeastOnce()
+                .Select(l => new HoconLiterals(l))
+                .Named("HoconLiterals");
 
         public static readonly Parser<string> QuotedString =
             Parse.AnyChar.Except(Parse.String("\"")).Many().Text()
@@ -52,7 +60,9 @@ namespace SpracheHocon.Parser
                 .Token()
                 .Named("QuotedString");
 
-        public static readonly Parser<HoconValue> HoconSubstitution =
+        public static readonly Parser<HoconElement> Q = QuotedString.Select(s => new HoconLiteral(s));
+
+        public static readonly Parser<HoconElement> HoconSubstitution =
             Path
                 .Contained(Parse.String("${").Token(), Parse.String("}").Token())
                 .Select(p => new HoconSubstitution(p))
@@ -70,9 +80,8 @@ namespace SpracheHocon.Parser
         public static readonly Parser<HoconValue> Value =
             HoconInclude
                 .Or(HoconObject)
-                .Or(HoconLiteral)
+                .Or(HoconLiterals)
                 .Or(HoconArray)
-                .Or(HoconSubstitution)
                 .Named("Value");
 
         public static readonly Parser<Pair> Pair =

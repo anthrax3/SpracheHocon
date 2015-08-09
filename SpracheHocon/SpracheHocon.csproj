@@ -46,8 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ast\HoconArray.cs" />
+    <Compile Include="Ast\HoconElement.cs" />
     <Compile Include="Ast\HoconInclude.cs" />
     <Compile Include="Ast\HoconLiteral.cs" />
+    <Compile Include="Ast\HoconLiterals.cs" />
     <Compile Include="Ast\HoconObject.cs" />
     <Compile Include="Ast\HoconSubstitution.cs" />
     <Compile Include="Ast\Pair.cs" />

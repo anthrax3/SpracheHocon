@@ -1,6 +1,6 @@
 namespace SpracheHocon.Ast
 {
-    public class HoconSubstitution : HoconValue
+    public class HoconSubstitution : HoconElement
     {
         public Path Path { get; private set; }
 
