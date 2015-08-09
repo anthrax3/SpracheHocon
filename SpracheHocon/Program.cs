@@ -24,7 +24,9 @@ namespace SpracheHocon
 
             var res = HoconParser.HoconObject.Parse(@"
 {
-    x = { include ""bar"" },
+    x { 
+        include ""bar"" 
+    },
     a {
        b {
          c = 123
@@ -84,9 +86,9 @@ namespace SpracheHocon
             Parse.Identifier(Parse.LetterOrDigit, Parse.LetterOrDigit).Token()
                 .Select(l => new HoconLiteral(l))
                 .Named("HoconLiteral");
-
+        
         public static readonly Parser<string> QuotedString =
-            Parse.LetterOrDigit.Many().Text()
+            Parse.AnyChar.Except(Parse.String("\"")).Many().Text()
                 .Contained(Parse.String("\""), Parse.String("\""))
                 .Token()
                 .Named("QuotedString");
@@ -120,7 +122,7 @@ namespace SpracheHocon
                 from value in Value
                 select new Pair(path, value))
                 .Or(from path in Path
-                    from value in HoconObject
+                    from value in HoconObject.Or(HoconInclude)
                     select new Pair(path, value)
                 ).Named("Pair");
 
